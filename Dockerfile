@@ -23,4 +23,4 @@ RUN mkdir -p tmp && chmod 777 tmp
 EXPOSE 8000
 
 # Commande de lancement
-CMD ["node", "server.js"]
+CMD ["node", "main.js"]
