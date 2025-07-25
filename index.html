@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Traitement Vidéo</title>
+</head>
+<body>
+  <h2>Découpe Vidéo</h2>
+  <input type="file" id="videoCut">
+  <input type="text" id="startCut" placeholder="Début (ex: 00:00:05)">
+  <input type="text" id="endCut" placeholder="Fin (ex: 00:00:10)">
+  <button onclick="cutVideo()">Découper</button>
+
+  <h2>Concaténer Vidéos</h2>
+  <input type="file" id="concatVideos" multiple>
+  <button onclick="concatVideos()">Fusionner</button>
+
+  <h2>Capture dernière image</h2>
+  <input type="file" id="videoCapture">
+  <button onclick="captureFrame()">Capturer</button>
+
+  <script>
+    const server = 'http://localhost:8000';
+
+    async function cutVideo() {
+      const file = document.getElementById('videoCut').files[0];
+      const start = document.getElementById('startCut').value;
+      const end = document.getElementById('endCut').value;
+      const form = new FormData();
+      form.append('video', file);
+      form.append('start', start);
+      form.append('end', end);
+      const res = await fetch(`${server}/cut-video`, { method: 'POST', body: form });
+      const data = await res.json();
+      if (data.success) window.open(data.video_url);
+      else alert(data.error || 'Erreur');
+    }
+
+    async function concatVideos() {
+      const files = document.getElementById('concatVideos').files;
+      const form = new FormData();
+      for (let i = 0; i < files.length; i++) form.append('videos', files[i]);
+      const res = await fetch(`${server}/concat`, { method: 'POST', body: form });
+      const data = await res.json();
+      if (data.success) window.open(data.output);
+      else alert(data.error || 'Erreur');
+    }
+
+    async function captureFrame() {
+      const file = document.getElementById('videoCapture').files[0];
+      const form = new FormData();
+      form.append('video', file);
+      const res = await fetch(`${server}/capture`, { method: 'POST', body: form });
+      const data = await res.json();
+      if (data.success) window.open(data.image_url);
+      else alert(data.error || 'Erreur');
+    }
+  </script>
+</body>
+</html>
